@@ -47,9 +47,15 @@ export const login = async (req: Request, res: Response) => {
 }
 
 export const register = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password } = req.body
-
+  const { firstName, lastName, email, password, confirm_password } = req.body
+  console.log(firstName, lastName, email, password, confirm_password)
   try {
+    if (password !== confirm_password) {
+      return res.status(500).json({
+        status: "failed",
+        message: "Passwords do not match",
+      })
+    }
     const userExists = await User.findOne({ email })
     if (userExists) {
       return res.status(500).json({
@@ -63,16 +69,19 @@ export const register = async (req: Request, res: Response) => {
       firstName,
       lastName,
       email,
-      hashedPassword,
+      password: hashedPassword,
       is_active: true,
     })
 
     await newUser.save()
+
+    const token = generateToken(newUser._id, USER_JWT_SECRET)
     // Send an email on successfully registration.
     return res.status(201).json({
       status: "successful",
       message: "Successfully registered new user",
       user: newUser,
+      token: token,
     })
   } catch (error) {
     return res.status(500).json({
