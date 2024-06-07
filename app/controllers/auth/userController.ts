@@ -47,8 +47,8 @@ export const login = async (req: Request, res: Response) => {
 }
 
 export const register = async (req: Request, res: Response) => {
-  const { firstName, lastName, email, password, confirm_password } = req.body
-  console.log(firstName, lastName, email, password, confirm_password)
+  const { firstName, lastName, email, role, password, confirm_password } =
+    req.body
   try {
     if (password !== confirm_password) {
       return res.status(500).json({
@@ -70,6 +70,7 @@ export const register = async (req: Request, res: Response) => {
       lastName,
       email,
       password: hashedPassword,
+      role,
       is_active: true,
     })
 
